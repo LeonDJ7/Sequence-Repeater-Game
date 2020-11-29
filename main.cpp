@@ -1,12 +1,6 @@
 #include "MicroBit.h"
 #include "string"
 
-string selectRandomAction();
-void displayAction(string action);
-bool listenForInput(string action);
-void onCorrectInput();
-void onIncorrectInput();
-
 MicroBit uBit;
 
 // BTN 1 - 0
@@ -19,72 +13,15 @@ MicroBitPin BTN3(MICROBIT_ID_IO_P2, MICROBIT_PIN_P2, PIN_CAPABILITY_ALL);
 MicroBitPin BTN4(MICROBIT_ID_IO_P3, MICROBIT_PIN_P3, PIN_CAPABILITY_ALL);
 
 // LED 1 - 4
-MicroBitPin LIGHT1(MICROBIT_ID_IO_P4, MICROBIT_PIN_P4, PIN_CAPABILITY_ALL);
+MicroBitPin LIGHT1(MICROBIT_ID_IO_P12, MICROBIT_PIN_P12, PIN_CAPABILITY_ALL);
 // LED 2 - 6
-MicroBitPin LIGHT2(MICROBIT_ID_IO_P6, MICROBIT_PIN_P6, PIN_CAPABILITY_ALL);
+MicroBitPin LIGHT2(MICROBIT_ID_IO_P13, MICROBIT_PIN_P13, PIN_CAPABILITY_ALL);
 // LED 3 - 7
-MicroBitPin LIGHT3(MICROBIT_ID_IO_P7, MICROBIT_PIN_P7, PIN_CAPABILITY_ALL);
+MicroBitPin LIGHT3(MICROBIT_ID_IO_P14, MICROBIT_PIN_P14, PIN_CAPABILITY_ALL);
 // LED 4 - 9
-MicroBitPin LIGHT4(MICROBIT_ID_IO_P9, MICROBIT_PIN_P9, PIN_CAPABILITY_ALL);
+MicroBitPin LIGHT4(MICROBIT_ID_IO_P15, MICROBIT_PIN_P15, PIN_CAPABILITY_ALL);
 
-int main() {
-    
-    uBit.init();
-    bool gameOver = false;
-    int level = 0;
-    string sequence[10] = {};
-    
-    //uBit.display.print("test");
-    
-    LIGHT1.setDigitalValue(0);
-    wait(0.5);
-    LIGHT1.setDigitalValue(1);
-    wait(0.5);
-    LIGHT1.setDigitalValue(0);
-    wait(0.5);
-    LIGHT1.setDigitalValue(1);
-    
-    while(gameOver == false) {
-        
-        level++;
-        
-        // add action to sequence, if array is full than double the size
-        
-        if (level == sizeof(sequence)/sizeof(*sequence)) {
-            string newSequence[sizeof(sequence)/sizeof(*sequence) * 2] = {};
-            for (int i = 0; i < level; i++) {
-                newSequence[i] = sequence[i];
-                std::copy(newSequence, newSequence + level, sequence);
-            }
-        }
-        
-        sequence[level-1] = selectRandomAction();
-        
-        // display sequence with LEDS
-        
-        for (int i = 0; i < level; i++) {
-            displayAction(sequence[i]);
-        }
-        
-        // wait for user input until sequence is complete or time for input runs out, if input is incorrect then end game and exit loop, if not repeat loop
-        
-        for (int i = 0; i < level; i++) {
-            bool inputIsCorrect = listenForInput(sequence[i]);
-            if (inputIsCorrect == false) {
-                gameOver = true;
-                onIncorrectInput();
-                break;
-            } else {
-                onCorrectInput();
-            }
-        }
-        
-    }
-    
-    release_fiber();
-}
-
-string selectRandomAction() {
+char* selectRandomAction() {
     
     int random = rand() % 4;
     
@@ -101,51 +38,131 @@ string selectRandomAction() {
     }
 }
 
-void displayAction(string action) {
+void displayAction(char* action) {
     
-    if (action == "BTN1") {
+    if (strcmp(action, "BTN1") == 0) {
         LIGHT1.setDigitalValue(1);
-        wait(0.5);
+        wait(1);
         LIGHT1.setDigitalValue(0);
-    } else if (action == "BTN2") {
+    } else if (strcmp(action, "BTN2") == 0) {
         LIGHT2.setDigitalValue(1);
-        wait(0.5);
+        wait(1);
         LIGHT2.setDigitalValue(0);
-    } else if (action == "BTN3") {
+    } else if (strcmp(action, "BTN3") == 0) {
         LIGHT3.setDigitalValue(1);
-        wait(0.5);
+        wait(1);
         LIGHT3.setDigitalValue(0);
-    } else if (action == "BTN4") {
+    } else if (strcmp(action, "BTN4") == 0) {
         LIGHT4.setDigitalValue(1);
-        wait(0.5);
+        wait(1);
         LIGHT4.setDigitalValue(0);
     }
     
 }
 
-bool listenForInput(string action) {
+bool listenForInput(char* action) {
+    
+    int start = clock();
+    double diff;
     
     // for each, add event listener, then remove after 3 seconds
-    if (action == "BTN1") {
+    if (strcmp(action, "BTN1") == 0) {
         
-    } else if (action == "BTN2") {
+        do {
+            if (BTN1.getDigitalValue() == 1) { return true; }
+            diff = (clock()-start)/(double)(CLOCKS_PER_SEC);
+        } while (diff < 3);
         
-    } else if (action == "BTN3") {
+    } else if (strcmp(action, "BTN2") == 0) {
         
-    } else if (action == "BTN4") {
+        do {
+            if (BTN2.getDigitalValue() == 1) { return true; }
+            diff = (clock()-start)/(double)(CLOCKS_PER_SEC);
+        } while (diff < 3);
+        
+    } else if (strcmp(action, "BTN3") == 0) {
+        
+        do {
+            if (BTN3.getDigitalValue() == 1) { return true; }
+            diff = (clock()-start)/(double)(CLOCKS_PER_SEC);
+        } while (diff < 3);
+        
+    } else if (strcmp(action, "BTN4") == 0) {
+        
+        do {
+            if (BTN4.getDigitalValue() == 1) { return true; }
+            diff = (clock()-start)/(double)(CLOCKS_PER_SEC);
+        } while (diff < 3);
         
     }
     
+    return false;
+    
 }
 
-// display something happy on microcontroller
 void onCorrectInput() {
-    uBit.display.print(":)");
+    uBit.display.scroll(":)");
 }
 
-// display something sad on microcontroller
 void onIncorrectInput() {
-    uBit.display.print(":(");
+    uBit.display.scroll("GAME OVER :(");
 }
 
-
+int main() {
+    
+    uBit.init();
+    bool gameOver = false;
+    int level = 0;
+    char* sequence[10];
+    
+    uBit.display.scroll("START!");
+    
+    while(gameOver == false) {
+        
+        
+        level = level+1;
+        
+        // add action to sequence, if array is full than double the size
+        
+        if (level == sizeof(sequence)/sizeof(*sequence)) {
+            char* newSequence[sizeof(sequence)/sizeof(*sequence) * 2];
+            for (int i = 0; i < level; i++) {
+                newSequence[i] = sequence[i];
+                std::copy(newSequence, newSequence + level, sequence);
+            }
+        }
+        
+        sequence[level-1] = selectRandomAction();;
+        
+        
+        // display sequence with LEDS
+        
+        for (int i = 0; i < level; i++) {
+            displayAction(sequence[i]);
+        }
+        
+        
+        
+        /*
+        
+        // wait for user input until sequence is complete or time for input runs out, if input is incorrect then end game and exit loop, if not repeat loop
+        
+        for (int i = 0; i < level; i++) {
+            bool inputIsCorrect = listenForInput(sequence[i]);
+            if (inputIsCorrect == false) {
+                gameOver = true;
+                onIncorrectInput();
+                break;
+            } else {
+                onCorrectInput();
+            }
+        }
+        
+        */
+        
+    }
+    
+    
+    
+    release_fiber();
+}
