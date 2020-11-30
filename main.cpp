@@ -1,5 +1,4 @@
 #include "MicroBit.h"
-#include "string"
 
 MicroBit uBit;
 
@@ -71,37 +70,33 @@ bool listenForInput(char* action) {
         do {
             if (BTN1.getDigitalValue() == 1) { return true; }
             diff = (clock()-start)/(double)(CLOCKS_PER_SEC);
-        } while (diff < 3);
+        } while (diff < 5);
         
     } else if (strcmp(action, "BTN2") == 0) {
         
         do {
             if (BTN2.getDigitalValue() == 1) { return true; }
             diff = (clock()-start)/(double)(CLOCKS_PER_SEC);
-        } while (diff < 3);
+        } while (diff < 5);
         
     } else if (strcmp(action, "BTN3") == 0) {
         
         do {
             if (BTN3.getDigitalValue() == 1) { return true; }
             diff = (clock()-start)/(double)(CLOCKS_PER_SEC);
-        } while (diff < 3);
+        } while (diff < 5);
         
     } else if (strcmp(action, "BTN4") == 0) {
         
         do {
             if (BTN4.getDigitalValue() == 1) { return true; }
             diff = (clock()-start)/(double)(CLOCKS_PER_SEC);
-        } while (diff < 3);
+        } while (diff < 5);
         
     }
     
     return false;
     
-}
-
-void onCorrectInput() {
-    uBit.display.scroll(":)");
 }
 
 void onIncorrectInput() {
@@ -115,12 +110,12 @@ int main() {
     int level = 0;
     char* sequence[10];
     
-    uBit.display.scroll("START!");
-    
     while(gameOver == false) {
         
-        
         level = level+1;
+        uBit.display.print(level);
+        wait(0.7);
+        uBit.display.print("");
         
         // add action to sequence, if array is full than double the size
         
@@ -141,28 +136,18 @@ int main() {
             displayAction(sequence[i]);
         }
         
-        
-        
-        /*
-        
         // wait for user input until sequence is complete or time for input runs out, if input is incorrect then end game and exit loop, if not repeat loop
         
         for (int i = 0; i < level; i++) {
             bool inputIsCorrect = listenForInput(sequence[i]);
             if (inputIsCorrect == false) {
                 gameOver = true;
-                onIncorrectInput();
                 break;
-            } else {
-                onCorrectInput();
             }
         }
         
-        */
-        
     }
     
-    
-    
+    onIncorrectInput();
     release_fiber();
 }
