@@ -1,4 +1,5 @@
 #include "MicroBit.h"
+#include "vector"
 
 MicroBit uBit;
 
@@ -9,7 +10,7 @@ MicroBitPin BTN2(MICROBIT_ID_IO_P1, MICROBIT_PIN_P1, PIN_CAPABILITY_ALL);
 // BTN 3 - 2
 MicroBitPin BTN3(MICROBIT_ID_IO_P2, MICROBIT_PIN_P2, PIN_CAPABILITY_ALL);
 // BTN 4 - 3
-MicroBitPin BTN4(MICROBIT_ID_IO_P3, MICROBIT_PIN_P3, PIN_CAPABILITY_ALL);
+MicroBitPin BTN4(MICROBIT_ID_IO_P8, MICROBIT_PIN_P8, PIN_CAPABILITY_ALL);
 
 // LED 1 - 4
 MicroBitPin LIGHT1(MICROBIT_ID_IO_P12, MICROBIT_PIN_P12, PIN_CAPABILITY_ALL);
@@ -37,23 +38,23 @@ char* selectRandomAction() {
     }
 }
 
-void displayAction(char* action) {
+void displayAction(char* action, float delay) {
     
     if (strcmp(action, "BTN1") == 0) {
         LIGHT1.setDigitalValue(1);
-        wait(1);
+        wait(delay);
         LIGHT1.setDigitalValue(0);
     } else if (strcmp(action, "BTN2") == 0) {
         LIGHT2.setDigitalValue(1);
-        wait(1);
+        wait(delay);
         LIGHT2.setDigitalValue(0);
     } else if (strcmp(action, "BTN3") == 0) {
         LIGHT3.setDigitalValue(1);
-        wait(1);
+        wait(delay);
         LIGHT3.setDigitalValue(0);
     } else if (strcmp(action, "BTN4") == 0) {
         LIGHT4.setDigitalValue(1);
-        wait(1);
+        wait(delay);
         LIGHT4.setDigitalValue(0);
     }
     
@@ -68,30 +69,90 @@ bool listenForInput(char* action) {
     if (strcmp(action, "BTN1") == 0) {
         
         do {
-            if (BTN1.getDigitalValue() == 1) { return true; }
+            if (BTN1.getDigitalValue() == 1) { 
+                displayAction("BTN1", 0.3);
+                return true; 
+            }
+            if (BTN2.getDigitalValue() == 1) { 
+                displayAction("BTN2", 0.3);
+                return false; 
+            }
+            if (BTN3.getDigitalValue() == 1) { 
+                displayAction("BTN3", 0.3);
+                return false; 
+            }
+            if (BTN4.getDigitalValue() == 1) { 
+                displayAction("BTN4", 0.3);
+                return false; 
+            }
             diff = (clock()-start)/(double)(CLOCKS_PER_SEC);
-        } while (diff < 5);
+        } while (diff < 3);
         
     } else if (strcmp(action, "BTN2") == 0) {
         
         do {
-            if (BTN2.getDigitalValue() == 1) { return true; }
+            if (BTN1.getDigitalValue() == 1) { 
+                displayAction("BTN1", 0.3);
+                return false; 
+            }
+            if (BTN2.getDigitalValue() == 1) { 
+                displayAction("BTN2", 0.3);
+                return true; 
+            }
+            if (BTN3.getDigitalValue() == 1) { 
+                displayAction("BTN3", 0.3);
+                return false; 
+            }
+            if (BTN4.getDigitalValue() == 1) { 
+                displayAction("BTN4", 0.3);
+                return false; 
+            }
             diff = (clock()-start)/(double)(CLOCKS_PER_SEC);
-        } while (diff < 5);
+        } while (diff < 3);
         
     } else if (strcmp(action, "BTN3") == 0) {
         
         do {
-            if (BTN3.getDigitalValue() == 1) { return true; }
+            if (BTN1.getDigitalValue() == 1) { 
+                displayAction("BTN1", 0.3);
+                return false; 
+            }
+            if (BTN2.getDigitalValue() == 1) { 
+                displayAction("BTN2", 0.3);
+                return false; 
+            }
+            if (BTN3.getDigitalValue() == 1) { 
+                displayAction("BTN3", 0.3);
+                return true; 
+            }
+            if (BTN4.getDigitalValue() == 1) { 
+                displayAction("BTN4", 0.3);
+                return false; 
+            }
             diff = (clock()-start)/(double)(CLOCKS_PER_SEC);
-        } while (diff < 5);
+        } while (diff < 3);
         
     } else if (strcmp(action, "BTN4") == 0) {
         
         do {
-            if (BTN4.getDigitalValue() == 1) { return true; }
+            if (BTN1.getDigitalValue() == 1) { 
+                displayAction("BTN1", 0.3);
+                return false; 
+            }
+            if (BTN2.getDigitalValue() == 1) { 
+                displayAction("BTN2", 0.3);
+                return false; 
+            }
+            if (BTN3.getDigitalValue() == 1) { 
+                displayAction("BTN3", 0.3);
+                return false; 
+            }
+            if (BTN4.getDigitalValue() == 1) { 
+                displayAction("BTN4", 0.3);
+                return true; 
+            }
             diff = (clock()-start)/(double)(CLOCKS_PER_SEC);
-        } while (diff < 5);
+        } while (diff < 3);
         
     }
     
@@ -108,32 +169,22 @@ int main() {
     uBit.init();
     bool gameOver = false;
     int level = 0;
-    char* sequence[10];
+    std::vector<char*> sequence;
     
     while(gameOver == false) {
         
         level = level+1;
-        uBit.display.print(level);
-        wait(0.7);
-        uBit.display.print("");
         
-        // add action to sequence, if array is full than double the size
+        //uBit.display.print(level);
+        //wait(0.5);
+        //uBit.display.print("");
         
-        if (level == sizeof(sequence)/sizeof(*sequence)) {
-            char* newSequence[sizeof(sequence)/sizeof(*sequence) * 2];
-            for (int i = 0; i < level; i++) {
-                newSequence[i] = sequence[i];
-                std::copy(newSequence, newSequence + level, sequence);
-            }
-        }
-        
-        sequence[level-1] = selectRandomAction();;
-        
+        sequence.push_back(selectRandomAction());
         
         // display sequence with LEDS
         
         for (int i = 0; i < level; i++) {
-            displayAction(sequence[i]);
+            displayAction(sequence[i], 1);
         }
         
         // wait for user input until sequence is complete or time for input runs out, if input is incorrect then end game and exit loop, if not repeat loop
@@ -144,6 +195,7 @@ int main() {
                 gameOver = true;
                 break;
             }
+            wait(0.25);
         }
         
     }
