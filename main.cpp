@@ -166,9 +166,9 @@ int main() {
         
         level = level+1;
         
-        //uBit.display.print(level);
-        //wait(0.5);
-        //uBit.display.print("");
+        uBit.display.print(level);
+        wait(0.5);
+        uBit.display.print("");
         
         sequence.push_back(selectRandomAction());
         
