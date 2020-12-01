@@ -13,7 +13,7 @@ MicroBitPin LIGHT4(MICROBIT_ID_IO_P15, MICROBIT_PIN_P15, PIN_CAPABILITY_ALL);
 
 char* selectRandomAction() {
     
-    int random = rand() % 2;
+    int random = rand() % 6;
     
     if (random == 0) {
         return "BTN1";
@@ -23,17 +23,13 @@ char* selectRandomAction() {
         return "BTN3";
     } else if (random == 3) {
         return "BTN4";
-    } else {
-        return "";
-    }
-    
-    /*
-    else if (random == 4) {
+    } else if (random == 4) {
         return "SHAKE";
     } else if (random == 5) {
         return "ROLL";
+    } else {
+        return "";
     }
-    */
     
 }
 
