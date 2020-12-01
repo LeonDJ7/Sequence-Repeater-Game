@@ -23,13 +23,17 @@ char* selectRandomAction() {
         return "BTN3";
     } else if (random == 3) {
         return "BTN4";
-    } else if (random == 4) {
-        return "SHAKE";
-    } else if (random == 5) {
-        return "ROLL";
     } else {
         return "";
     }
+    
+    /*
+    else if (random == 4) {
+        return "SHAKE";
+    } else if (random == 5) {
+        return "ROLL";
+    }
+    */
     
 }
 
