@@ -2,7 +2,6 @@
 #include "vector"
 
 MicroBit uBit;
-
 MicroBitPin BTN1(MICROBIT_ID_IO_P0, MICROBIT_PIN_P0, PIN_CAPABILITY_ALL);
 MicroBitPin BTN2(MICROBIT_ID_IO_P1, MICROBIT_PIN_P1, PIN_CAPABILITY_ALL);
 MicroBitPin BTN3(MICROBIT_ID_IO_P2, MICROBIT_PIN_P2, PIN_CAPABILITY_ALL);
@@ -14,7 +13,7 @@ MicroBitPin LIGHT4(MICROBIT_ID_IO_P15, MICROBIT_PIN_P15, PIN_CAPABILITY_ALL);
 
 char* selectRandomAction() {
     
-    int random = rand() % 4;
+    int random = rand() % 2;
     
     if (random == 0) {
         return "BTN1";
@@ -24,9 +23,14 @@ char* selectRandomAction() {
         return "BTN3";
     } else if (random == 3) {
         return "BTN4";
+    } else if (random == 4) {
+        return "SHAKE";
+    } else if (random == 5) {
+        return "ROLL";
     } else {
         return "";
     }
+    
 }
 
 void displayAction(char* action, float delay) {
@@ -47,12 +51,17 @@ void displayAction(char* action, float delay) {
         LIGHT4.setDigitalValue(1);
         wait(delay);
         LIGHT4.setDigitalValue(0);
+    } else if (strcmp(action, "SHAKE") == 0) {
+        uBit.display.scroll("SHAKE!");
+    } else if (strcmp(action, "ROLL") == 0) {
+        uBit.display.scroll("ROLL!");
     }
     
 }
 
 bool listenForInput(char* action) {
     
+    uBit.accelerometer.updateSample();
     int start = clock();
     double diff;
     
@@ -76,6 +85,14 @@ bool listenForInput(char* action) {
                 displayAction("BTN4", 0.3);
                 return false; 
             }
+            if (uBit.accelerometer.getGesture() == 11) { // the id for shake
+                uBit.display.print("X");
+                return false;
+            }
+            if (uBit.accelerometer.getRoll() >= 180) {
+                uBit.display.print("X");
+                return false;
+            }
             diff = (clock()-start)/(double)(CLOCKS_PER_SEC);
         } while (diff < 3);
         
@@ -97,6 +114,14 @@ bool listenForInput(char* action) {
             if (BTN4.getDigitalValue() == 1) { 
                 displayAction("BTN4", 0.3);
                 return false; 
+            }
+            if (uBit.accelerometer.getGesture() == 11) { // the id for shake
+                uBit.display.print("X");
+                return false;
+            }
+            if (uBit.accelerometer.getRoll() >= 180) {
+                uBit.display.print("X");
+                return false;
             }
             diff = (clock()-start)/(double)(CLOCKS_PER_SEC);
         } while (diff < 3);
@@ -120,6 +145,14 @@ bool listenForInput(char* action) {
                 displayAction("BTN4", 0.3);
                 return false; 
             }
+            if (uBit.accelerometer.getGesture() == 11) { // the id for shake
+                uBit.display.print("X");
+                return false;
+            }
+            if (uBit.accelerometer.getRoll() >= 180) {
+                uBit.display.print("X");
+                return false;
+            }
             diff = (clock()-start)/(double)(CLOCKS_PER_SEC);
         } while (diff < 3);
         
@@ -141,6 +174,74 @@ bool listenForInput(char* action) {
             if (BTN4.getDigitalValue() == 1) { 
                 displayAction("BTN4", 0.3);
                 return true; 
+            }
+            if (uBit.accelerometer.getGesture() == 11) { // the id for shake
+                uBit.display.print("X");
+                return false;
+            }
+            if (uBit.accelerometer.getRoll() >= 180) {
+                uBit.display.print("X");
+                return false;
+            }
+            diff = (clock()-start)/(double)(CLOCKS_PER_SEC);
+        } while (diff < 3);
+        
+    } else if (strcmp(action, "SHAKE") == 0) {
+        
+        do {
+            if (BTN1.getDigitalValue() == 1) { 
+                displayAction("BTN1", 0.3);
+                return false; 
+            }
+            if (BTN2.getDigitalValue() == 1) { 
+                displayAction("BTN2", 0.3);
+                return false; 
+            }
+            if (BTN3.getDigitalValue() == 1) { 
+                displayAction("BTN3", 0.3);
+                return false; 
+            }
+            if (BTN4.getDigitalValue() == 1) { 
+                displayAction("BTN4", 0.3);
+                return false; 
+            }
+            if (uBit.accelerometer.getGesture() == 11) { // the id for shake
+                uBit.display.print("!");
+                return true;
+            }
+            if (uBit.accelerometer.getRoll() >= 180) {
+                uBit.display.print("X");
+                return false;
+            }
+            diff = (clock()-start)/(double)(CLOCKS_PER_SEC);
+        } while (diff < 3);
+        
+    } else if (strcmp(action, "ROLL") == 0) {
+        
+        do {
+            if (BTN1.getDigitalValue() == 1) { 
+                displayAction("BTN1", 0.3);
+                return false; 
+            }
+            if (BTN2.getDigitalValue() == 1) { 
+                displayAction("BTN2", 0.3);
+                return false; 
+            }
+            if (BTN3.getDigitalValue() == 1) { 
+                displayAction("BTN3", 0.3);
+                return false; 
+            }
+            if (BTN4.getDigitalValue() == 1) { 
+                displayAction("BTN4", 0.3);
+                return false; 
+            }
+            if (uBit.accelerometer.getGesture() == 11) { // the id for shake
+                uBit.display.print("X");
+                return false;
+            }
+            if (uBit.accelerometer.getRoll() >= 180) {
+                uBit.display.print("!");
+                return true;
             }
             diff = (clock()-start)/(double)(CLOCKS_PER_SEC);
         } while (diff < 3);
@@ -165,11 +266,9 @@ int main() {
     while(gameOver == false) {
         
         level = level+1;
-        
         uBit.display.print(level);
         wait(0.5);
         uBit.display.print("");
-        
         sequence.push_back(selectRandomAction());
         
         // display sequence with LEDS
